@@ -1,11 +1,11 @@
 // Firebase Web configuration for COS Number Check.
 // This configuration is intended for browser use; do not put a service-account key here.
 window.COS_FIREBASE_CONFIG = {
-  apiKey: "AIzaSyDZ6xSl2URl8k2SDOuyVhMOvf_QQmrh85Q",
-  authDomain: "uk-visa-c64c8.firebaseapp.com",
-  projectId: "uk-visa-c64c8",
-  storageBucket: "uk-visa-c64c8.firebasestorage.app",
-  messagingSenderId: "723643621281",
-  appId: "1:723643621281:web:782112378bc551b47275e0",
-  measurementId: "G-RBEDXQWSDJ"
+  apiKey: "AIzaSyDpKxKGdkhaueM5PrMp1DzL-QV7krmgrmE",
+  authDomain: "cos-number-9ff3f.firebaseapp.com",
+  projectId: "cos-number-9ff3f",
+  storageBucket: "cos-number-9ff3f.firebasestorage.app",
+  messagingSenderId: "339730787397",
+  appId: "1:339730787397:web:6183da2a4185c586f3c72c",
+  measurementId: "G-3XR3GPLNGT"
 };
