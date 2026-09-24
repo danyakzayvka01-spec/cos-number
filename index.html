@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>COS Number Check</title>
+  <style>
+    :root { --navy:#061a33; --royal:#0b3a82; --red:#c8102e; --cream:#f7f2e8; --gold:#c7a44b; --ink:#11243e; --green:#17643e; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:Inter,Arial,sans-serif; color:var(--ink); background:var(--cream); }
+    .topline { height:7px; background:linear-gradient(90deg,var(--red) 0 25%,#fff 25% 31%,var(--royal) 31% 69%,#fff 69% 75%,var(--red) 75%); }
+    header { background:var(--navy); color:#fff; padding:20px clamp(20px,6vw,90px); display:flex; justify-content:space-between; align-items:center; gap:20px; }
+    .brand { font-family:Georgia,serif; font-size:23px; letter-spacing:.4px; display:flex; align-items:center; gap:12px; }
+    .crest { width:37px; height:37px; border:1px solid var(--gold); border-radius:50%; display:grid; place-items:center; color:var(--gold); font-size:19px; }
+    nav { display:flex; gap:10px; align-items:center; }
+    #guestNav[hidden] { display:none; }
+    .btn { border:1px solid transparent; border-radius:3px; padding:11px 18px; background:var(--red); color:#fff; font-weight:700; cursor:pointer; font-size:14px; }
+    .btn.secondary { background:transparent; border-color:#91a3ba; }
+    .btn.gold { background:var(--gold); color:#07172e; }
+    .btn.danger { background:#8f1026; }
+    .btn:disabled { cursor:wait; opacity:.68; }
+    .btn:hover:not(:disabled) { filter:brightness(1.1); }
+    .profile { display:none; align-items:center; gap:10px; font-size:14px; }
+    .profile.show { display:flex; }
+    .profile-icon { width:36px; height:36px; display:grid; place-items:center; border-radius:50%; background:var(--gold); color:var(--navy); font-weight:800; font-size:15px; }
+    .profile small { display:block; color:#b7c7da; margin-top:2px; }
+    main { min-height:calc(100vh - 84px); background:linear-gradient(90deg,rgba(6,26,51,.91),rgba(6,26,51,.66)),url('https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=1800&q=80') center/cover; padding:clamp(55px,10vw,130px) clamp(20px,8vw,130px); }
+    .hero { max-width:750px; color:#fff; }
+    .eyebrow { font-size:12px; letter-spacing:2px; text-transform:uppercase; color:#f0d47c; font-weight:800; }
+    .hero h1 { font-family:Georgia,serif; font-size:clamp(42px,6vw,72px); line-height:1.05; margin:14px 0; }
+    .hero p { font-size:18px; line-height:1.6; color:#e5ebf4; max-width:650px; }
+    .lookup { margin-top:34px; background:#fff; padding:24px; border-left:5px solid var(--red); box-shadow:0 18px 45px #020b18a3; color:var(--ink); max-width:690px; }
+    .lookup label { font-weight:800; display:block; margin-bottom:10px; }
+    .fieldrow { display:flex; gap:10px; }
+    .fieldrow input { flex:1; border:1px solid #b9c5d2; border-radius:3px; padding:14px; font-size:16px; text-transform:uppercase; }
+    .sync-status { font-size:12px; color:#617087; margin:12px 0 0; }
+    .sync-status.error { color:#a3152e; }
+    .sync-status.ready { color:var(--green); }
+    .result { display:none; max-width:690px; background:#fff; margin-top:22px; padding:24px; box-shadow:0 10px 30px #020b1870; color:var(--ink); }
+    .result.show { display:block; }
+    .result-grid { display:grid; grid-template-columns:minmax(190px,260px) 1fr; gap:22px; align-items:start; }
+    .result-grid.public { grid-template-columns:1fr; }
+    .certificate-image { width:100%; max-width:260px; min-height:165px; max-height:210px; border:1px solid #cbd4df; object-fit:contain; background:#f7f9fc; }
+    .tag { background:#e2f1e7; color:var(--green); padding:6px 9px; font-weight:800; font-size:12px; border-radius:2px; display:inline-block; }
+    .details h2 { margin:12px 0 4px; font-family:Georgia,serif; }
+    .details dl { display:grid; grid-template-columns:115px 1fr; gap:9px; margin:17px 0 0; font-size:14px; }
+    .details dt { color:#66758a; }
+    .details dd { margin:0; font-weight:700; }
+    .error { display:none; color:#a3152e; font-size:14px; margin-top:13px; }
+    .error.show { display:block; }
+    dialog { border:0; padding:0; border-radius:5px; box-shadow:0 20px 70px #0009; width:min(520px,calc(100% - 32px)); }
+    dialog.wide { width:min(980px,calc(100% - 32px)); }
+    dialog::backdrop { background:#061a33bb; }
+    .modal { padding:28px; }
+    .modal h2 { font-family:Georgia,serif; margin:0 0 8px; }
+    .modal p { color:#526277; line-height:1.5; }
+    .modal label { display:block; font-size:13px; font-weight:800; margin-top:15px; }
+    .modal input { margin-top:6px; width:100%; padding:11px; border:1px solid #c6d0dd; border-radius:3px; }
+    .modal footer { display:flex; justify-content:flex-end; gap:10px; margin-top:24px; }
+    .adminbar { display:none; position:fixed; bottom:20px; right:20px; background:var(--navy); padding:12px; color:#fff; box-shadow:0 8px 30px #0007; }
+    .adminbar.show { display:flex; gap:12px; align-items:center; }
+    .upload-preview { display:none; width:100%; max-width:360px; height:180px; object-fit:contain; margin-top:10px; border:1px solid #ccd; background:#f7f9fc; }
+    .upload-preview.show { display:block; }
+    .form-note { font-size:12px; color:#66758a; line-height:1.45; margin-top:7px; }
+    .records-toolbar { display:flex; justify-content:space-between; gap:20px; align-items:flex-start; }
+    .records-toolbar h2 { margin-bottom:5px; }
+    .record-list { display:grid; gap:12px; max-height:min(64vh,650px); overflow:auto; margin-top:20px; padding-right:4px; }
+    .record-card { border:1px solid #cbd4df; background:#f8fafc; padding:14px; display:grid; grid-template-columns:120px minmax(0,1fr) auto; gap:16px; align-items:center; }
+    .record-thumb { width:120px; height:86px; object-fit:contain; background:#fff; border:1px solid #d5dde7; }
+    .record-thumb.placeholder { display:grid; place-items:center; color:#748399; font-size:12px; text-align:center; }
+    .record-meta h3 { font-family:Georgia,serif; margin:0 0 8px; font-size:20px; }
+    .record-meta dl { display:grid; grid-template-columns:72px minmax(0,1fr); gap:5px 10px; margin:0; font-size:13px; }
+    .record-meta dt { color:#66758a; }
+    .record-meta dd { margin:0; font-weight:700; overflow-wrap:anywhere; }
+    .record-actions { display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
+    .records-toolbar .btn.secondary, .record-actions .btn.secondary { background:#fff; border-color:#7f90a5; color:var(--navy); }
+    .empty-state { border:1px dashed #aebbc9; padding:35px 20px; text-align:center; color:#66758a; background:#f8fafc; }
+    .edit-record-image { width:100%; height:150px; object-fit:contain; border:1px solid #ccd5e0; background:#f7f9fc; margin-top:12px; }
+    footer { background:#061a33; color:#b7c7da; padding:22px clamp(20px,6vw,90px); font-size:13px; display:flex; justify-content:space-between; gap:20px; }
+    @media(max-width:600px) { header { align-items:flex-start; flex-direction:column; } .fieldrow { flex-direction:column; } .result-grid { grid-template-columns:1fr; } .certificate-image { max-width:100%; } footer { flex-direction:column; } nav { width:100%; justify-content:flex-end; } .record-card { grid-template-columns:90px minmax(0,1fr); } .record-thumb { width:90px; height:72px; } .record-actions { grid-column:1/-1; justify-content:flex-start; } }
+  </style>
+</head>
+<body>
+  <div class="topline"></div>
+  <header>
+    <div class="brand"><span class="crest">C</span>COS Number Check</div>
+    <nav id="guestNav"><button class="btn secondary" type="button" onclick="openModal('login')">Sign in</button></nav>
+    <div id="profile" class="profile">
+      <span class="profile-icon">A</span>
+      <span><strong id="profileName">Account</strong><small id="profileRole">Account holder</small></span>
+      <button id="verifyAccount" class="btn secondary" type="button" onclick="sendVerification()" hidden>Send verification email</button>
+      <button id="refreshAccount" class="btn secondary" type="button" onclick="refreshAccount()" hidden>I've verified</button>
+      <button class="btn secondary" onclick="logout()">Sign out</button>
+    </div>
+  </header>
+  <main>
+    <section class="hero">
+      <div class="eyebrow">City of London - Verification portal</div>
+      <h1>COS Number Check</h1>
+      <p>Enter a COS number to view the registration status.</p>
+      <div class="lookup">
+        <label for="cos">COS number</label>
+        <div class="fieldrow"><input id="cos" maxlength="20" autocomplete="off"><button class="btn" onclick="lookup()">Check status</button></div>
+        <div id="error" class="error" role="alert">No record found.</div>
+        <div id="syncStatus" class="sync-status" aria-live="polite">Connecting to record storage...</div>
+      </div>
+      <article id="result" class="result" aria-live="polite">
+        <div id="resultGrid" class="result-grid">
+          <img id="recordCertificate" class="certificate-image" alt="Record image" hidden>
+          <div class="details"><span id="recordTag" class="tag">REGISTERED</span><h2 id="recordName">Registration record</h2><dl><dt>COS number</dt><dd id="recordCos"></dd><dt>Status</dt><dd id="recordStatus">Registered</dd></dl></div>
+        </div>
+      </article>
+    </section>
+  </main>
+  <footer><span>Copyright 2026 COS Number Check</span><span>Designed in London</span></footer>
+  <aside id="adminbar" class="adminbar"><span>Administrator mode</span><button class="btn gold" onclick="openRecordList()">COS records</button><button class="btn secondary" onclick="openModal('account')">+ Client account</button><button class="btn secondary" onclick="logout()">Sign out</button></aside>
+  <dialog id="login">
+    <form method="dialog" class="modal" onsubmit="signIn(); return false;">
+      <h2>Account sign in</h2><p>Enter your administrator email or the client login assigned to this record.</p>
+      <label>Email or client login<input id="loginName" required autocomplete="username"></label><label>Password<input id="loginPass" type="password" required autocomplete="current-password"></label>
+      <div id="loginError" class="error">Invalid email or password.</div>
+      <footer><button class="btn secondary" value="cancel">Cancel</button><button class="btn" type="submit">Sign in</button></footer>
+    </form>
+  </dialog>
+  <dialog id="add">
+    <form method="dialog" class="modal" onsubmit="addRecord(); return false;">
+      <h2>Add COS record</h2><p>The full record is visible only to the administrator and the assigned verified client account. Store personal documents only with the holder's consent and a lawful purpose.</p>
+      <label>COS number<input id="newCos" required maxlength="20" autocomplete="off"></label><label>Client name<input id="newName" required autocomplete="name"></label><label>Client login or email (optional)<input id="newOwnerEmail" autocomplete="username"></label><div class="form-note">For a short login such as “client01”, the site automatically creates the internal Firebase email.</div><label>Private record image (JPG, PNG or WebP)<input id="newCertificate" type="file" accept="image/jpeg,image/png,image/webp" onchange="preview(this)" required></label>
+      <img id="preview" class="upload-preview" alt="Record image preview"><footer><button class="btn secondary" type="button" onclick="document.getElementById('add').close()">Cancel</button><button id="saveRecord" class="btn" type="submit">Save record</button></footer>
+    </form>
+  </dialog>
+  <dialog id="account">
+    <form method="dialog" class="modal" onsubmit="createClientAccount(); return false;">
+      <h2>Create client account</h2><p>Create the login first, then assign it when adding the COS record.</p>
+      <label>Client login<input id="accountLogin" required minlength="3" maxlength="32" pattern="[A-Za-z0-9._-]+" autocomplete="off"></label>
+      <label>Account password<input id="accountPassword" type="password" required minlength="12" autocomplete="new-password"></label>
+      <div class="form-note">Use at least 12 characters containing letters and numbers. Do not use a birth date, passport number, or COS number.</div>
+      <div id="accountError" class="error" role="alert"></div>
+      <footer><button class="btn secondary" type="button" onclick="document.getElementById('account').close()">Cancel</button><button id="createClient" class="btn" type="submit">Create account</button></footer>
+    </form>
+  </dialog>
+  <dialog id="records" class="wide">
+    <section class="modal">
+      <div class="records-toolbar"><div><h2>COS records</h2><p>Administrator-only list of private registration records.</p></div><button class="btn secondary" type="button" onclick="document.getElementById('records').close()">Close</button></div>
+      <div id="recordsError" class="error" role="alert"></div>
+      <div id="recordList" class="record-list" aria-live="polite"></div>
+    </section>
+  </dialog>
+  <dialog id="editRecord">
+    <form method="dialog" class="modal" onsubmit="saveEditedRecord(); return false;">
+      <h2>Edit COS record</h2><p>Changing the COS number or client account also updates its public status and private account link.</p>
+      <input id="editOriginalCos" type="hidden">
+      <label>COS number<input id="editCos" required maxlength="20" autocomplete="off"></label>
+      <label>Client name<input id="editName" required autocomplete="name"></label>
+      <label>Client login or email<input id="editOwnerEmail" autocomplete="username"></label>
+      <img id="editRecordImage" class="edit-record-image" alt="Current private record image">
+      <div id="editRecordError" class="error" role="alert"></div>
+      <footer><button class="btn secondary" type="button" onclick="document.getElementById('editRecord').close()">Cancel</button><button id="updateRecord" class="btn" type="submit">Save changes</button></footer>
+    </form>
+  </dialog>
+  <script src="./firebase-config.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>

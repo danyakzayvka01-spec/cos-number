@@ -1,0 +1,43 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email == 'kybanichbek1488@gmail.com';
+    }
+
+    function isRecordOwner() {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && resource.data.ownerEmail == request.auth.token.email;
+    }
+
+    function isVerifiedEmailOwner(ownerEmail) {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && request.auth.token.email == ownerEmail;
+    }
+
+    match /cosRecords/{cos} {
+      allow get: if isAdmin() || isRecordOwner();
+      allow list: if isAdmin();
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /ownerRecords/{ownerEmail}/records/{cos} {
+      allow get, list: if isAdmin() || isVerifiedEmailOwner(ownerEmail);
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /publicCosStatus/{cos} {
+      allow get: if true;
+      allow list: if false;
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

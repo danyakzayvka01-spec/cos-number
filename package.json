@@ -1,0 +1,11 @@
+{
+  "name": "cos-secure-portal",
+  "version": "1.0.0",
+  "private": true,
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "firebase-admin": "13.10.0"
+  }
+}
